@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: src
+Version: 2.0.0
+Summary: An Easydata-generated repo for exploring the TIMC vectorizers library to construct word, document and topic embeddings.
+Author: Tutte Institute for Mathematics and Computing
+License: MIT
+License-File: LICENSE
