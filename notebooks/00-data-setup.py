@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib
 import seaborn as sns
 import csv
+from sklearn.utils import Bunch
 
 def read_format_citeseer():
     content = pd.read_csv('../data/citeseer-doc-classification/citeseer.content', sep='\t', header=None)
@@ -86,3 +87,62 @@ def read_format_recipes(recipe_min_size=3):
     label_name['new_label'] = [new_name for x in label_name.country for new_name in new_names if x in new_name]
     
     return(recipes, recipes_label_id, ingredients_id, label_name, color_key)
+
+
+def read_format_20_newsgroup():
+    from sklearn.datasets import fetch_20newsgroups
+    opts={"subset":"all", "remove":"('headers', 'footers', 'quotes')"}
+    ds_in = fetch_20newsgroups(**opts)
+
+    prune_limit = 200
+
+    long_enough = [len(t) > prune_limit for t in ds_in.data]
+    targets = np.array(ds_in.target)[long_enough]
+    news_data = [t for t in ds_in.data if len(t) > prune_limit]
+    
+    religion = ("alt.atheism", "talk.religion.misc", "soc.religion.christian")
+    politics = ("talk.politics.misc", "talk.politics.mideast", "talk.politics.guns")
+    sport = ("rec.sport.baseball", "rec.sport.hockey")
+    comp = (
+        "comp.graphics",
+        "comp.os.ms-windows.misc",
+        "comp.sys.ibm.pc.hardware",
+        "comp.sys.mac.hardware",
+        "comp.windows.x",
+    )
+    sci = (
+        "sci.crypt",
+        "sci.electronics",
+        "sci.med",
+        "sci.space",
+    )
+    misc = (
+        "misc.forsale",
+        "rec.autos",
+        "rec.motorcycles",
+    )
+
+    color_key = {}
+    for l, c in zip(religion, sns.color_palette("Blues", 4)[1:]):
+        color_key[l] = matplotlib.colors.rgb2hex(c)
+    for l, c in zip(politics, sns.color_palette("Purples", 4)[1:]):
+        color_key[l] = matplotlib.colors.rgb2hex(c)
+    for l, c in zip(comp, sns.color_palette("YlOrRd", 5)):
+        color_key[l] = matplotlib.colors.rgb2hex(c)
+    for l, c in zip(sci, sns.color_palette("light:teal", 5)[1:]):
+        color_key[l] = matplotlib.colors.rgb2hex(c)
+    for l, c in zip(sport, sns.color_palette("light:#660033", 4)[1:3]):
+        color_key[l] = matplotlib.colors.rgb2hex(c)
+    for l, c in zip(misc, sns.color_palette("YlGn", 4)[1:]):
+        color_key[l] = matplotlib.colors.rgb2hex(c)
+    color_key["word"] = "#777777bb"
+    
+    ds = Bunch(data = news_data, 
+            filenames = ds_in.filenames, 
+            target_names = ds_in.target_names, 
+            target = targets,
+            DESCR = ds_in.DESCR,
+            COLOR_KEY = color_key)
+
+
+    return(ds)
